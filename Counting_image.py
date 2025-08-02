@@ -1,35 +1,35 @@
 from ultralytics import YOLO
-import cv2
 import os
 
+# Load the YOLOv8 model
+model = YOLO('yolov8n.pt')
 
-model = YOLO('yolov8n.pt')  
+# Path to the folder containing vehicle images
+image_folder = "C:/Users/samar/OneDrive/Desktop/CODING/Python/Mynewproj/Smart-Traffic-Management/Cars Images"
 
+# List of image filenames
+image_files = ["cars1.jpg", "cars2.jpg", "cars3.jpg", "cars4.jpg", "cars5.jpg"]
+
+# Function to detect and count vehicles in an image
 def detect_and_count_vehicles(image_path):
-   
-    results = model.predict(source=image_path, conf=0.5)  
+    results = model.predict(source=image_path, conf=0.5)
     detections = results[0].boxes.data.tolist()
     vehicle_count = 0
-
     for detection in detections:
-        class_id = int(detection[5])  
-        if 2 <= class_id <= 7:  
-            vehicle_count += 1 
-            
+        class_id = int(detection[5])
+        if 2 <= class_id <= 7:  # Classes 2 to 7 are vehicle classes in COCO
+            vehicle_count += 1
     return vehicle_count
 
-
-image_paths = ["C:/Users/samar/OneDrive/Desktop/CODING/Python/Mynewproj/Smart-Traffic-Management/Cars Images/cars1.jpg", "C:/Users/samar/OneDrive/Desktop/CODING/Python/Mynewproj/Smart-Traffic-Management/Cars Images/cars2.jpg", "C:/Users/samar/OneDrive/Desktop/CODING/Python/Mynewproj/Smart-Traffic-Management/Cars Images/cars3.jpg","C:/Users/samar/OneDrive/Desktop/CODING/Python/Mynewproj/Smart-Traffic-Management/Cars Images/cars4.jpg","C:/Users/samar/OneDrive/Desktop/CODING/Python/Mynewproj/Smart-Traffic-Management/Cars Images/cars5.jpg"] 
-vehicle_counts = []  
-count=1
-for image_path in image_paths:
-    if os.path.exists(image_path):
-        vehicle_count = detect_and_count_vehicles(image_path)
-        vehicle_counts.append(vehicle_count)  
-        print(f"Vehicles detected in road number {count}: {vehicle_count}")
-        count=count+1
+# Process all images
+vehicle_counts = []
+for i, file in enumerate(image_files):
+    full_path = os.path.join(image_folder, file)
+    if os.path.exists(full_path):
+        count = detect_and_count_vehicles(full_path)
+        vehicle_counts.append(count)
+        print(f"Vehicles detected in road number {i+1}: {count}")
     else:
-        print(f"Image not found: {image_path}")
-count=0
+        print(f"Image not found: {full_path}")
 
 print("Vehicle counts for each road:", vehicle_counts)
